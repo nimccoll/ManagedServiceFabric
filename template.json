@@ -1,0 +1,180 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "managedClusters_sf_name": {
+            "type": "string"
+        },
+        "region": {
+            "type": "string"
+        },
+        "adminUserName": {
+            "type": "string"
+        },
+        "adminPassword": {
+            "type": "string"
+        },
+        "thumbprint":{
+            "type": "string"
+        },
+        "nodeType1SubnetId": {
+            "type": "string"
+        },
+        "nodeType2SubnetId": {
+            "type": "string"
+        },
+        "nodeType1VmSize": {
+            "type": "string"
+        },
+        "nodeType2VmSize": {
+            "type": "string"
+        },
+        "publicLoadBalancerBackendPoolId": {
+            "type": "string"
+        },
+        "publicLoadBalancerNatPoolId": {
+            "type": "string"
+        }        
+    },
+    "variables": {},
+    "resources": [
+        {
+            "type": "Microsoft.ServiceFabric/managedClusters",
+            "apiVersion": "2024-04-01",
+            "name": "[parameters('managedClusters_sf_name')]",
+            "location": "[parameters('region')]",
+            "tags": {
+                "SFRP.DisableDefaultOutboundAccess": "true"
+            },
+            "sku": {
+                "name": "Standard"
+            },
+            "properties": {
+                "clusterCodeVersion": "10.1.2338.9590",
+                "clusterUpgradeMode": "Automatic",
+                "clusterUpgradeCadence": "Wave0",
+                "adminUserName": "[parameters('adminUserName')]",
+                "adminPassword": "[parameters('adminPassword')]",
+                "dnsName": "[parameters('managedClusters_sf_name')]",
+                "clientConnectionPort": 19000,
+                "httpGatewayConnectionPort": 19080,
+                "allowRdpAccess": false,
+                "clients": [
+                    {
+                        "isAdmin": true,
+                        "thumbprint": "[parameters('thumbprint')]"
+                    }
+                ],
+                "addonFeatures": [
+                    "DnsService"
+                ],
+                "enableAutoOSUpgrade": true,
+                "zonalResiliency": false,
+                "useCustomVnet": true,
+                "zonalUpdateMode": "Default"
+            }
+        },
+        {
+            "type": "Microsoft.ServiceFabric/managedClusters/nodetypes",
+            "apiVersion": "2024-04-01",
+            "name": "[concat(parameters('managedClusters_sf_name'), '/nodetype1')]",
+            "location": "[parameters('region')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.ServiceFabric/managedClusters', parameters('managedClusters_sf_name'))]"
+            ],
+            "sku": {
+                "name": "Standard_P1",
+                "tier": "Standard",
+                "capacity": 5
+            },
+            "properties": {
+                "isPrimary": true,
+                "subnetId": "[parameters('nodeType1SubnetId')]",                
+                "vmImagePublisher": "MicrosoftWindowsServer",
+                "vmImageOffer": "WindowsServer",
+                "vmImageSku": "2019-Datacenter",
+                "vmImageVersion": "latest",
+                "vmSize": "[parameters('nodeType1VmSize')]",
+                "vmInstanceCount": 5,
+                "dataDiskSizeGB": 256,
+                "dataDiskType": "StandardSSD_LRS",
+                "dataDiskLetter": "S",
+                "placementProperties": {},
+                "capacities": {},
+                "applicationPorts": {
+                    "startPort": 20000,
+                    "endPort": 30000
+                },
+                "ephemeralPorts": {
+                    "startPort": 49152,
+                    "endPort": 65534
+                },
+                "vmSecrets": [],
+                "vmExtensions": [],
+                "isStateless": false,
+                "multiplePlacementGroups": false,
+                "enableOverProvisioning": false,
+                "zones": [],
+                "enableEncryptionAtHost": false,
+                "enableAcceleratedNetworking": false,
+                "useTempDataDisk": false,
+                "enableNodePublicIP": false,
+                "enableNodePublicIPv6": false
+            }
+        },
+        {
+            "type": "Microsoft.ServiceFabric/managedClusters/nodetypes",
+            "apiVersion": "2024-04-01",
+            "name": "[concat(parameters('managedClusters_sf_name'), '/nodetype2')]",
+            "location": "[parameters('region')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.ServiceFabric/managedClusters', parameters('managedClusters_sf_name'))]"
+            ],
+            "sku": {
+                "name": "Standard_S0",
+                "tier": "Standard",
+                "capacity": 1
+            },
+            "properties": {
+                "isPrimary": false,
+                "subnetId": "[parameters('nodeType2SubnetId')]",                
+                "vmImagePublisher": "MicrosoftWindowsServer",
+                "vmImageOffer": "WindowsServer",
+                "vmImageSku": "2022-datacenter",
+                "vmImageVersion": "latest",
+                "vmSize": "[parameters('nodeType2VmSize')]",
+                "vmInstanceCount": 1,
+                "dataDiskSizeGB": 128,
+                "dataDiskType": "StandardSSD_LRS",
+                "dataDiskLetter": "S",
+                "placementProperties": {},
+                "capacities": {},
+                "applicationPorts": {
+                    "startPort": 20000,
+                    "endPort": 30000
+                },
+                "ephemeralPorts": {
+                    "startPort": 49152,
+                    "endPort": 65534
+                },
+                "vmSecrets": [],
+                "vmExtensions": [],
+                "isStateless": false,
+                "multiplePlacementGroups": false,
+                "enableOverProvisioning": false,
+                "zones": [],
+                "enableEncryptionAtHost": false,
+                "enableAcceleratedNetworking": false,
+                "useTempDataDisk": false,
+                "enableNodePublicIP": false,
+                "enableNodePublicIPv6": false,
+                "frontendConfigurations": [
+                    {
+                      "loadBalancerBackendAddressPoolId": "[parameters('publicLoadBalancerBackendPoolId')]",
+                      "loadBalancerInboundNatPoolId": "[parameters('publicLoadBalancerNatPoolId')]"
+                    }
+                  ]
+            }
+        }
+    ]
+}
