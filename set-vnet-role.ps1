@@ -20,3 +20,6 @@ $sp = Get-AzADServicePrincipal -DisplayName "Azure Service Fabric Resource Provi
 $vnet = Get-AzVirtualNetwork -Name $virtualNetworkName -ResourceGroupName $resourceGroupName
 $ra1 = New-AzRoleAssignment -PrincipalId $sp.Id -RoleDefinitionName "Network Contributor" -Scope $vnet.subnets[0].Id
 $ra2 = New-AzRoleAssignment -PrincipalId $sp.Id -RoleDefinitionName "Network Contributor" -Scope $vnet.subnets[1].Id
+
+Write-Output $vnet.subnets[0].Id
+Write-Output $vnet.subnets[1].Id

@@ -19,3 +19,6 @@ Select-AzSubscription -SubscriptionId $subscriptionId
 $sp = Get-AzADServicePrincipal -DisplayName "Azure Service Fabric Resource Provider"
 $lb = Get-AzLoadBalancer -Name $loadBalancerName -ResourceGroupName $resourceGroupName
 $ra = New-AzRoleAssignment -PrincipalId $sp.Id -RoleDefinitionName "Network Contributor" -Scope $lb.Id
+
+Write-Output $lb.BackendAddressPools[0].Id
+Write-Output $lb.InboundNatPools[0].Id
