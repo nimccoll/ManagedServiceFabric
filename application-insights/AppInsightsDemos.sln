@@ -1,0 +1,31 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.11.35303.130
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AIASPNetCore", "AIASPNetCore\AIASPNetCore.csproj", "{472117A4-C9B7-478B-85B1-67B4CD380B6C}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AIConsoleCore", "AIConsoleCore\AIConsoleCore.csproj", "{32A57DBA-E679-49AF-8D4B-34DD00349A6E}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{472117A4-C9B7-478B-85B1-67B4CD380B6C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{472117A4-C9B7-478B-85B1-67B4CD380B6C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{472117A4-C9B7-478B-85B1-67B4CD380B6C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{472117A4-C9B7-478B-85B1-67B4CD380B6C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{32A57DBA-E679-49AF-8D4B-34DD00349A6E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{32A57DBA-E679-49AF-8D4B-34DD00349A6E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{32A57DBA-E679-49AF-8D4B-34DD00349A6E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{32A57DBA-E679-49AF-8D4B-34DD00349A6E}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {328F8F9E-3FD9-42A3-B68D-BDBE246368CC}
+	EndGlobalSection
+EndGlobal

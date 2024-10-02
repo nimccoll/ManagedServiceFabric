@@ -13,7 +13,7 @@ By default a Service Fabric Managed Cluster will create its own load balancer an
 
 ## Scripts and Templates
 ### create-lb.json
-This ARM template will create a Standard SKU Azure Load Balancer for use with the secondary node types of the Service Fabric Managed Cluster
+This ARM template will create a Standard SKU Azure Load Balancer for use with the secondary node type of the Service Fabric Managed Cluster
 
 **Parameters**
 - dnsName - The DNS name that will be used for the Azure Load Balancer
@@ -58,3 +58,33 @@ This ARM template will create a Service Fabric Managed Cluster using an existing
 - nodeType1VmSize - The VM size of the secondary node type
 - publicLoadBalancerBackendPoolId - The backend pool ID of the load balancer for the secondary node type
 - publicLoadBalancerNatPoolId - The NAT pool ID of the load balancer for the secondary node type
+
+### internal-load-balancer/create-ilb.json
+This ARM template will create a Standard SKU Azure Internal Load Balancer for use with the secondary node type of the Service Fabric Managed Cluster
+
+**Parameters**
+- loadBalancers_ILB_name - The name of the Azure Internal Load Balancer
+- loadBalancers_subnet_id - The subnet ID of the subnet for the secondary node type. The internal load balancer will be deployed to this subnet.
+
+### internal-load-balancer/template.json ###
+This ARM template will create a Service Fabric Managed Cluster using an existing virtual network with a subnet for each node type as depicted in the diagram below.
+
+![](https://learn.microsoft.com/en-us/azure/service-fabric/media/how-to-managed-cluster-networking/sfmc-byolb-scenario-3.png)
+
+The default Azure Load Balancer created by the Service Fabric Managed Cluster deployment will be used for the primary node type. An Azure Internal Load Balancer will be used for the secondary node type's incoming IP traffic while the default Azure Load Balancer created by the Service Fabric Managed Cluster deployment will be used for the outbound IP traffic of the secondary node type. This is necessary as the secondary node type requires outbound access to the internet which is not provided by the ILB. This template also adds the Azure Monitor Windows Agent to each node type.
+
+**Please make sure you run the set-lb-role.ps1 and set-vnet-role.ps1 scripts prior to running this template.**
+
+**Parameters**
+
+- managedClusters_sf_name - The name of the Service Fabric Managed Cluster
+- region - The Azure region where the resources will be deployed
+- adminUserName - The name of the admin user for the nodes
+- adminPassword - The password of the admin user for the nodes
+- thumbprint - The thumbprint of the client certificate
+- nodeType1SubnetId - The subnet ID of the subnet for the primary node type
+- nodeType2SubnetId - The subnet ID of the subnet for the secondary node type
+- nodeType1VmSize - The VM size of the primary node type
+- nodeType1VmSize - The VM size of the secondary node type
+- publicLoadBalancerBackendPoolId - The backend pool ID of the internal load balancer for the secondary node type
+- publicLoadBalancerNatPoolId - The NAT pool ID of the internal load balancer for the secondary node type

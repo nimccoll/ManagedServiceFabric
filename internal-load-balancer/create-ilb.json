@@ -1,0 +1,122 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "loadBalancers_ILB_name": {
+            "type": "string"
+        },
+        "loadBalancers_subnet_id": {
+            "type": "string"
+        }
+    },
+    "variables": {
+        "lbID": "[resourceId('Microsoft.Network/loadBalancers', parameters('loadBalancers_ILB_name'))]"
+      },
+    "resources": [
+        {
+            "type": "Microsoft.Network/loadBalancers",
+            "apiVersion": "2024-01-01",
+            "name": "[parameters('loadBalancers_ILB_name')]",
+            "location": "[resourcegroup().location]",
+            "sku": {
+                "name": "Standard",
+                "tier": "Regional"
+            },
+            "properties": {
+                "frontendIPConfigurations": [
+                    {
+                        "name": "lb-frontend",
+                        "id": "[concat(resourceId('Microsoft.Network/loadBalancers', parameters('loadBalancers_ILB_name')), '/frontendIPConfigurations/lb-frontend')]",
+                        "properties": {
+                            "privateIPAllocationMethod": "Dynamic",
+                            "subnet": {
+                                "id": "[parameters('loadBalancers_subnet_id')]"
+                            },
+                            "privateIPAddressVersion": "IPv4"
+                        }
+                    }
+                ],
+                "backendAddressPools": [
+                    {
+                        "name": "lb-backend-pool",
+                        "id": "[resourceId('Microsoft.Network/loadBalancers/backendAddressPools', parameters('loadBalancers_ILB_name'), 'lb-backend-pool')]",
+                        "properties": {
+                            "loadBalancerBackendAddresses": []
+                        }
+                    }
+                ],
+                "loadBalancingRules": [
+                    {
+                        "name": "lb-HTTP-rule",
+                        "id": "[concat(resourceId('Microsoft.Network/loadBalancers', parameters('loadBalancers_ILB_name')), '/loadBalancingRules/lb-HTTP-rule')]",
+                        "properties": {
+                            "frontendIPConfiguration": {
+                                "id": "[concat(resourceId('Microsoft.Network/loadBalancers', parameters('loadBalancers_ILB_name')), '/frontendIPConfigurations/lb-frontend')]"
+                            },
+                            "frontendPort": 80,
+                            "backendPort": 80,
+                            "enableFloatingIP": false,
+                            "idleTimeoutInMinutes": 15,
+                            "protocol": "Tcp",
+                            "enableTcpReset": true,
+                            "loadDistribution": "Default",
+                            "disableOutboundSnat": true,
+                            "backendAddressPool": {
+                                "id": "[resourceId('Microsoft.Network/loadBalancers/backendAddressPools', parameters('loadBalancers_ILB_name'), 'lb-backend-pool')]"
+                            },
+                            "backendAddressPools": [
+                                {
+                                    "id": "[resourceId('Microsoft.Network/loadBalancers/backendAddressPools', parameters('loadBalancers_ILB_name'), 'lb-backend-pool')]"
+                                }
+                            ],
+                            "probe": {
+                                "id": "[concat(resourceId('Microsoft.Network/loadBalancers', parameters('loadBalancers_ILB_name')), '/probes/lb-health-probe')]"
+                            }
+                        }
+                    }
+                ],
+                "probes": [
+                    {
+                        "name": "lb-health-probe",
+                        "id": "[concat(resourceId('Microsoft.Network/loadBalancers', parameters('loadBalancers_ILB_name')), '/probes/lb-health-probe')]",
+                        "properties": {
+                            "protocol": "Tcp",
+                            "port": 80,
+                            "intervalInSeconds": 5,
+                            "numberOfProbes": 1,
+                            "probeThreshold": 1,
+                            "noHealthyBackendsBehavior": "AllProbedDown"
+                        }
+                    }
+                ],
+                "inboundNatRules": [],
+                "outboundRules": [],
+                "inboundNatPools": [
+                    {
+                        "name": "lb-nat-pool",
+                        "properties": {
+                          "frontendIPConfiguration": {
+                            "id": "[concat(variables('lbID'), '/frontendIPConfigurations/lb-frontend')]"
+                          },
+                          "protocol": "tcp",
+                          "frontendPortRangeStart": "50000",
+                          "frontendPortRangeEnd": "64000",
+                          "backendPort": "3389"
+                        }
+                      }
+                ]
+            }
+        },
+        {
+            "type": "Microsoft.Network/loadBalancers/backendAddressPools",
+            "apiVersion": "2024-01-01",
+            "name": "[concat(parameters('loadBalancers_ILB_name'), '/lb-backend-pool')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Network/loadBalancers', parameters('loadBalancers_ILB_name'))]"
+            ],
+            "properties": {
+                "loadBalancerBackendAddresses": []
+            }
+        }
+    ]
+}
